@@ -57,11 +57,8 @@ void main() {
 				rb_delete(bst, bst->root, tree_search(bst, bst->root, -(file)));
 			}
 		}
-		else if (file == 0) {
-			break;
-		}
 		else {
-			printf("�̰Թ���\n");
+			break;
 		}
 	}
 	fclose(fp);
