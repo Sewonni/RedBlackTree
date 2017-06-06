@@ -173,20 +173,6 @@ void rb_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n) {
 	self->root->color = BLACK;
 }
 
-//void node_search(BSTPtr self, NodePtr tree, int find, int failed[]) {
-//	int i = 0;
-//	while (tree != self->nil) {
-//		if(find < tree->val)
-//			if (tree->left = NULL) {
-//				failed[i++] < -find;
-//			}
-//			else 
-//				node_search(self, tree->left, find, failed[]);
-//	}
-//
-//		
-//}
-
 NodePtr tree_search(BSTPtr self, NodePtr where, int find) {
 	if (where == self->nil || find == where->val)
 		return where;
