@@ -49,7 +49,7 @@ void main() {
 		}
 		else if (file < 0) {
 			if(tree_search(bst, bst->root, -(file)) == bst->nil){
-				fopen_s(&fp2, "C:\\zebra\\input.txt", "at");
+				fopen_s(&fp2, "C:\\zebra\\trash.txt", "at");
 				fprintf(fp2, "%d\n", -(file));
 				fclose(fp2);
 			}
@@ -131,6 +131,7 @@ void rb_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n) {
 				n->parent->color = BLACK; temp->color = BLACK;
 				n->parent->parent->color = RED;
 				n = n->parent->parent;
+				break;
 			}
 			else {
 				if (n == n->parent->right) {
@@ -140,6 +141,7 @@ void rb_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n) {
 				n->parent->color = BLACK;
 				n->parent->parent->color = RED;
 				right_rotate(self, n->parent->parent);
+				break;
 			}
 		}
 		else {
@@ -149,6 +151,7 @@ void rb_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n) {
 				temp->color = BLACK;
 				n->parent->parent->color = RED;
 				n = n->parent->parent;
+				break;
 			}
 			else {
 				if (n == n->parent->left) {
@@ -158,6 +161,7 @@ void rb_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n) {
 				n->parent->color = BLACK;
 				n->parent->parent->color = RED;
 				left_rotate(self, n->parent->parent);
+				break;
 			}
 		}
 	}
