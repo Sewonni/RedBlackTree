@@ -57,25 +57,18 @@ void main() {
 				rb_delete(bst, bst->root, tree_search(bst, bst->root, -(file)));
 			}
 		}
-		else {
-			bst_print(bst, bst->root, 0);
+		else if (file == 0) {
 			printf("total = %d\n", total_node(bst, bst->root, total));
 			printf("nb = %d\n", black_node(bst, bst->root, nb));
 			printf("bh = %d\n", black_height(bst, bst->root, bh));
 			bst_inorder(bst, bst->root);
 		}
-
+		else {
+			printf("�̰Թ���\n");
+			printf("�̰Թ���\n");
+		}
 	}
 	fclose(fp);
-
-	/*fopen_s(&fp, "C:\\zebra\\input.txt", "wt");
-	for (index = 0; index < 10; index++) {
-		fprintf(fp, "%d\n", index);
-
-	}
-	fclose(fp);
-
-	*/
 }
 
 NodePtr node_alloc(int newval) {
@@ -366,7 +359,7 @@ void bst_inorder(BSTPtr self, NodePtr tree) {
 		return;
 	else {
 		bst_inorder(self, tree->left);
-		printf("%d\n ", tree->val);
+		printf("%d ", tree->val);
 		bst_inorder(self, tree->right);
 	}
 }
@@ -385,14 +378,10 @@ int black_node(BSTPtr self, NodePtr tree, int nb) {
 		return 0;
 
 	if (tree->color == BLACK) {
-		nb += tree->color;
+		return black_node(self, tree->left, nb) + black_node(self, tree->right, nb) + 1;
 	}
-
-	nb += black_node(self, tree->left, nb);
-	nb += black_node(self, tree->right, nb);
-
-
-	return nb;
+	else
+		return black_node(self, tree->left, nb) + black_node(self, tree->right, nb);
 }
 
 int black_height(BSTPtr self, NodePtr tree, int bh) {
