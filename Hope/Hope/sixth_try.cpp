@@ -38,19 +38,18 @@ void main() {
 	BSTPtr bst = bst_alloc();
 	create_nilnode(bst);
 	FILE *fp, *fp2;
-	int index;
 	int file;
 	int total = 0;
 	int nb = 0;
 	int bh = 0;
-	fopen_s(&fp, "C:\\zebra\\test2.txt", "rt");
+	fopen_s(&fp, "C:\\zebra\\test.txt", "rt");
 	while (fscanf_s(fp, "%d", &file, sizeof(file)) != EOF) {
 		if (file > 0) {
 			rb_insert(bst, bst->root, bst->nil, node_alloc(file));
 		}
 		else if (file < 0) {
 			if(tree_search(bst, bst->root, -(file)) == bst->nil){
-				fopen_s(&fp2, "C:\\zebra\\input.txt", "wt");
+				fopen_s(&fp2, "C:\\zebra\\input.txt", "at");
 				fprintf(fp2, "%d\n", -(file));
 				fclose(fp2);
 			}
