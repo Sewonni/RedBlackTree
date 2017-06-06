@@ -58,17 +58,17 @@ void main() {
 			}
 		}
 		else if (file == 0) {
-			printf("total = %d\n", total_node(bst, bst->root, total));
-			printf("nb = %d\n", black_node(bst, bst->root, nb));
-			printf("bh = %d\n", black_height(bst, bst->root, bh));
-			bst_inorder(bst, bst->root);
+			break;
 		}
 		else {
-			printf("�̰Թ���\n");
 			printf("�̰Թ���\n");
 		}
 	}
 	fclose(fp);
+	printf("total = %d\n", total_node(bst, bst->root, total));
+	printf("nb = %d\n", black_node(bst, bst->root, nb));
+	printf("bh = %d\n", black_height(bst, bst->root, bh));
+	bst_inorder(bst, bst->root);
 }
 
 NodePtr node_alloc(int newval) {
