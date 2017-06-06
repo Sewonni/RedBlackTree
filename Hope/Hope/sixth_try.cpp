@@ -37,7 +37,7 @@ int black_height(BSTPtr self, NodePtr tree, int bh);
 void main() {
 	BSTPtr bst = bst_alloc();
 	create_nilnode(bst);
-	FILE *fp;
+	FILE *fp, *fp2;
 	int index;
 	int file;
 	int total = 0;
@@ -49,12 +49,13 @@ void main() {
 			rb_insert(bst, bst->root, bst->nil, node_alloc(file));
 		}
 		else if (file < 0) {
-			if (tree_search(bst, bst->root, -(file)) == bst->nil) {
-				printf("%d\n", -(file));
+			if(tree_search(bst, bst->root, -(file)) == bst->nil){
+				fopen_s(&fp2, "C:\\zebra\\input.txt", "wt");
+				fprintf(fp2, "%d\n", -(file));
+				fclose(fp2);
 			}
 			else {
 				rb_delete(bst, bst->root, tree_search(bst, bst->root, -(file)));
-
 			}
 		}
 		else {
@@ -62,8 +63,9 @@ void main() {
 			printf("total = %d\n", total_node(bst, bst->root, total));
 			printf("nb = %d\n", black_node(bst, bst->root, nb));
 			printf("bh = %d\n", black_height(bst, bst->root, bh));
-
+			bst_inorder(bst, bst->root);
 		}
+
 	}
 	fclose(fp);
 
@@ -323,7 +325,7 @@ void rb_delete_fixup(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr x) {
 void left_rotate(BSTPtr self, NodePtr n) {
 	NodePtr y = n->right;
 	n->right = y->left;
-	if (y->left != self->nil)
+	if (y->left != self->nil && y-> left != NULL)
 		y->left->parent = n;
 	y->parent = n->parent;
 	if (n->parent == self->nil)
@@ -338,7 +340,7 @@ void left_rotate(BSTPtr self, NodePtr n) {
 void right_rotate(BSTPtr self, NodePtr n) {
 	NodePtr y = n->left;
 	n->left = y->right;
-	if (y->right != self->nil)
+	if (y->right != self->nil && y->right != NULL)
 		y->right->parent = n;
 	y->parent = n->parent;
 	if (n->parent == self->nil)
@@ -365,7 +367,7 @@ void bst_inorder(BSTPtr self, NodePtr tree) {
 		return;
 	else {
 		bst_inorder(self, tree->left);
-		printf("%d ", tree->val);
+		printf("%d\n ", tree->val);
 		bst_inorder(self, tree->right);
 	}
 }
@@ -393,8 +395,6 @@ int black_node(BSTPtr self, NodePtr tree, int nb) {
 
 	return nb;
 }
-
-
 
 int black_height(BSTPtr self, NodePtr tree, int bh) {
 	while (tree != self->nil) {
