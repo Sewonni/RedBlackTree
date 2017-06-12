@@ -462,11 +462,8 @@ int black_node(BSTPtr self, NodePtr tree, int nb) {
 
 int black_height(BSTPtr self, NodePtr tree, int bh) {
 	while (tree != self->nil) {
-		if (tree->color = BLACK) {
-			bh++;
-		}
+		bh += tree->color;
 		tree = tree->left;
 	}
-	bh--; //nil Á¦¿Ü
 	return bh;
 }
