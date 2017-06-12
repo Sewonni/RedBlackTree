@@ -19,10 +19,11 @@ BSTPtr bst_alloc();
 BSTPtr create_nilnode(BSTPtr bst);
 void bst_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n);
 void rb_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n);
+void rbt_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n);
+void rbt_insert_fixup(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n);
 NodePtr tree_search(BSTPtr self, NodePtr where, int find);
 NodePtr tree_minimum(BSTPtr self, NodePtr x);
 void transplant(BSTPtr self, NodePtr origin, NodePtr n);
-void tree_delete(BSTPtr self, NodePtr tree, NodePtr x);
 void rb_delete(BSTPtr self, NodePtr tree, NodePtr z);
 void rb_delete_fixup(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr x);
 void left_rotate(BSTPtr self, NodePtr n);
@@ -45,13 +46,15 @@ void main() {
 	int insert = 0;
 	int del = 0;
 	int miss = 0;
-	fopen_s(&fp, "C:\\zebra\\test.txt", "rt");
+	int i;
+	fopen_s(&fp, "C:\\zebra\\rbtest\\rbtest\\test02.txt", "rt");
 	while (fscanf_s(fp, "%d", &file, sizeof(file)) != EOF) {
 		if (file > 0) {
-			rb_insert(bst, bst->root, bst->nil, node_alloc(file));
+			rbt_insert(bst, bst->root, bst->nil, node_alloc(file));
 			insert++;
 		}
 		else if (file < 0) {
+			printf("%d\n", file);
 			if(tree_search(bst, bst->root, -(file)) == bst->nil){
 				fopen_s(&fp2, "C:\\zebra\\trash.txt", "at");
 				fprintf(fp2, "%d\n", -(file));
@@ -95,8 +98,8 @@ BSTPtr bst_alloc() {
 BSTPtr create_nilnode(BSTPtr bst) {
 	bst->nil = (NodePtr)malloc(sizeof(Node));
 	bst->nil->val = NULL;
-	bst->nil->left = NULL;
-	bst->nil->right = NULL;
+	bst->nil->left = bst->nil;
+	bst->nil->right = bst->nil;
 	bst->nil->color = BLACK;
 	bst->root = bst->nil;
 	return bst;
@@ -177,21 +180,97 @@ void rb_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n) {
 	self->root->color = BLACK;
 }
 
-NodePtr tree_search(BSTPtr self, NodePtr where, int find) {
-	if (where == self->nil || find == where->val)
-		return where;
-	if (find < where->val) {
-		if (where->left == self->nil)
-			return self->nil;
-		else 
-			return tree_search(self, where->left, find);
+void rbt_insert(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n) {
+	NodePtr y = nil;
+	while (tree != nil) {
+		y = tree;
+		if (n->val < tree->val) {
+			tree = tree->left;
+		}
+		else
+			tree = tree->right;
+	}
+	n->parent = y;
+	if (y == nil) {
+		self->root = n;
+	}
+	else if (n->val < y->val) {
+		y->left = n;
 	}
 	else {
-		if (where->right == self->nil)
-			return self->nil;
-		else
-			return tree_search(self, where->right, find);
+		y->right = n;
 	}
+	n->left = nil;
+	n->right = nil;
+	n->color = RED;
+	rbt_insert_fixup(self, tree, nil, n);
+}
+
+void rbt_insert_fixup(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr n) {
+	NodePtr y;
+	while (n->parent->color == RED) {
+		if (n->parent == n->parent->parent->left) {
+			y = n->parent->parent->right;
+			if (y->color == RED) {
+				n->parent->color = BLACK;
+				y->color = BLACK;
+				n->parent->parent->color = RED;
+				n = n->parent->parent;
+			}
+			else {
+				if (n == n->parent->right) {
+					n = n->parent;
+					left_rotate(self, n);
+				}
+				n->parent->color = BLACK;
+				n->parent->parent->color = RED;
+				right_rotate(self, n->parent->parent);
+			}
+		}
+		else {
+			y = n->parent->parent->left;
+			if (y->color == RED) {
+				n->parent->color = BLACK;
+				y->color = BLACK;
+				n->parent->parent->color = RED;
+				n = n->parent->parent;
+			}
+			else {
+				if (n == n->parent->left) {
+					n = n->parent;
+					right_rotate(self, n);
+				}
+				n->parent->color = BLACK;
+				n->parent->parent->color = RED;
+				right_rotate(self, n->parent->parent);
+			}
+		}
+	}
+	self->root->color = BLACK;
+}
+
+NodePtr tree_search(BSTPtr self, NodePtr x, int find) {
+	while (x != self->nil && find != x->val) {
+		if (find < x->val)
+			x = x->left;
+		else x = x->right;
+   }
+	return x;
+
+	//if (x == self->nil || find == x->val)
+	//	return x;
+	//if (find < x->val) {
+	//	if (x->left == self->nil)
+	//		return self->nil;
+	//	else 
+	//		return tree_search(self, x->left, find);
+	//}
+	//else if(find > x->val){
+	//	if (x->right == self->nil)
+	//		return self->nil;
+	//	else
+	//		return tree_search(self, x->right, find);
+	//}
 }
 
 NodePtr tree_minimum(BSTPtr self, NodePtr x) {
@@ -212,35 +291,18 @@ void transplant(BSTPtr self, NodePtr origin, NodePtr n) {
 	n->parent = origin->parent;
 }
 
-void tree_delete(BSTPtr self, NodePtr tree, NodePtr x) {
-	if (x->left == NULL) {
-		transplant(self, x, x->right);
-	}
-	else if (x->right == NULL)
-		transplant(self, x, x->left);
-	else {
-		NodePtr y = tree_minimum(self, x->right);
-		if (y->parent != x) {
-			transplant(self, y, y->right);
-			y->right = x->right;
-			y->right->parent = y;
-		}
-		transplant(self, x, y);
-		y->left = x->left;
-		y->left->parent = y;
-	}
-}
-
 void rb_delete(BSTPtr self, NodePtr tree, NodePtr z) {
 	NodePtr x;
 	NodePtr y = z;
 	int y_original_color = y->color;
 	if (z->left == self->nil) {
-		x = z->right; x->parent = z;
+		x = z->right; 
+		//x->parent = z;
 		transplant(self, z, z->right);
 	}
 	else if (z->right == self->nil) {
-		x = z->left; x->parent = z;
+		x = z->left;
+		//x->parent = z;
 		transplant(self, z, z->left);
 	}
 	else {
@@ -327,7 +389,7 @@ void rb_delete_fixup(BSTPtr self, NodePtr tree, NodePtr nil, NodePtr x) {
 void left_rotate(BSTPtr self, NodePtr n) {
 	NodePtr y = n->right;
 	n->right = y->left;
-	if (y->left != self->nil && y-> left != NULL)
+	if (y->left != self->nil)
 		y->left->parent = n;
 	y->parent = n->parent;
 	if (n->parent == self->nil)
@@ -342,7 +404,7 @@ void left_rotate(BSTPtr self, NodePtr n) {
 void right_rotate(BSTPtr self, NodePtr n) {
 	NodePtr y = n->left;
 	n->left = y->right;
-	if (y->right != self->nil && y->right != NULL)
+	if (y->right != self->nil)
 		y->right->parent = n;
 	y->parent = n->parent;
 	if (n->parent == self->nil)
