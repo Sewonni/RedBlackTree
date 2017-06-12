@@ -42,19 +42,25 @@ void main() {
 	int total = 0;
 	int nb = 0;
 	int bh = 0;
+	int insert = 0;
+	int del = 0;
+	int miss = 0;
 	fopen_s(&fp, "C:\\zebra\\test.txt", "rt");
 	while (fscanf_s(fp, "%d", &file, sizeof(file)) != EOF) {
 		if (file > 0) {
 			rb_insert(bst, bst->root, bst->nil, node_alloc(file));
+			insert++;
 		}
 		else if (file < 0) {
 			if(tree_search(bst, bst->root, -(file)) == bst->nil){
 				fopen_s(&fp2, "C:\\zebra\\trash.txt", "at");
 				fprintf(fp2, "%d\n", -(file));
 				fclose(fp2);
+				miss++;
 			}
 			else {
 				rb_delete(bst, bst->root, tree_search(bst, bst->root, -(file)));
+				del++;
 			}
 		}
 		else {
@@ -63,6 +69,9 @@ void main() {
 	}
 	fclose(fp);
 	printf("total = %d\n", total_node(bst, bst->root, total));
+	printf("insert = %d\n", insert);
+	printf("delete = %d\n", del);
+	printf("miss = %d\n", miss);
 	printf("nb = %d\n", black_node(bst, bst->root, nb));
 	printf("bh = %d\n", black_height(bst, bst->root, bh));
 	bst_inorder(bst, bst->root);
@@ -361,6 +370,10 @@ void bst_inorder(BSTPtr self, NodePtr tree) {
 	else {
 		bst_inorder(self, tree->left);
 		printf("%d ", tree->val);
+		if (tree->color == RED)
+			printf("[R]");
+		else
+			printf("[B]");
 		bst_inorder(self, tree->right);
 	}
 }
