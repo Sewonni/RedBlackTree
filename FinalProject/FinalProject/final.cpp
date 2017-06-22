@@ -32,6 +32,8 @@ NodePtr tree_maximum(BSTPtr bst, NodePtr n);
 NodePtr tree_minimum(BSTPtr bst, NodePtr n);
 NodePtr predecessor(BSTPtr bst, NodePtr n);
 NodePtr successor(BSTPtr bst, NodePtr n);
+NodePtr nil_predecessor(BSTPtr bst, NodePtr x, int n);
+NodePtr nil_successor(BSTPtr bst, NodePtr x, int n);
 
 
 
@@ -42,16 +44,6 @@ void main() {
 	FILE *fp, *fp2, *fp3;
 	int file, file2, file3;
 	int x = 0, y = 0;
-
-	//rb_insert(bst, bst->root, bst->nil, node_alloc(1));
-	//rb_insert(bst, bst->root, bst->nil, node_alloc(2));
-	//rb_insert(bst, bst->root, bst->nil, node_alloc(3));
-	//rb_insert(bst, bst->root, bst->nil, node_alloc(4));
-	//rb_insert(bst, bst->root, bst->nil, node_alloc(5));
-	//bst_print(bst, bst->root, 0);
-	//rb_delete(bst, bst->root, tree_search(bst, bst->root, 2));
-	//bst_print(bst, bst->root, 0);
-	//printf("%d\n", predecessor(bst, tree_search(bst, bst->root, 4))->val);
 
 	fopen_s(&fp, "C:\\zebra\\test01.txt", "rt");
 	while (fscanf_s(fp, "%d", &file, sizeof(file)) != EOF) {
@@ -70,12 +62,9 @@ void main() {
 		}
 	}
 	fclose(fp);
-	bst_print(bst, bst->root, 0);
-	printf("%d\n", tree_maximum(bst, bst->root)->val);
 	fopen_s(&fp2, "C:\\zebra\\search01.txt", "rt");
 	fopen_s(&fp3, "C:\\zebra\\output00.txt", "at");
 	while (fscanf_s(fp2, "%d", &file2, sizeof(file)) != EOF) {
-		/*printf("%d\n", tree_search(bst, bst->root, file2)==bst->nil);*/
 		if (file2 == 0)
 			break;
 		else if (tree_search(bst, bst->root, file2) == bst->nil) {
@@ -84,26 +73,8 @@ void main() {
 			else if (file2 > tree_maximum(bst, bst->root)->val)
 				fprintf(fp3, "%d NIL NIL\n", tree_maximum(bst, bst->root)->val);
 			else {
-				if (tree_search(bst, bst->root, file2) == tree_search(bst, bst->root, file2)->parent->left) {
-					x = predecessor(bst, tree_search(bst, bst->root, file2)->parent)->val;
-					y = tree_search(bst, bst->root, file2)->parent->val;
-				}
-				else {
-					x = tree_search(bst, bst->root, file2)->parent->val;
-					y = successor(bst, tree_search(bst, bst->root, file2)->parent)->val;
-				}
-				fprintf(fp3, "%d NIL %d\n", x, y);
+				fprintf(fp3, "%d NIL %d\n", nil_predecessor(bst, bst->root, file2)->val, nil_successor(bst, bst->root, file2)->val);
 			}
-/*
-
-				fprintf(fp3,"%da ", predecessor(bst, tree_search(bst, bst->root, file2))->val);
-
-			fprintf(fp3, "NIL ");
-			
-			if (file2 > tree_maximum(bst, bst->root)->val)
-				fprintf(fp3, "NIL\n");
-			else
-				fprintf(fp3, "%db\n", successor(bst, tree_search(bst, bst->root, file2))->val);*/
 		}
 		else {
 			if (tree_search(bst, bst->root, file2) == tree_minimum(bst, bst->root))
@@ -462,13 +433,6 @@ NodePtr tree_minimum(BSTPtr bst, NodePtr n) {
 }
 
 NodePtr predecessor(BSTPtr bst, NodePtr n) {
-	if (n == bst->nil) {
-		if (n == n->parent->left)
-			return predecessor(bst, n->parent);
-		else
-			return n->parent;
-	}
-	else {
 		if (n->left != bst->nil)
 			return tree_maximum(bst, n->left);
 		NodePtr y = n->parent;
@@ -477,17 +441,10 @@ NodePtr predecessor(BSTPtr bst, NodePtr n) {
 			y = y->parent;
 		}
 		return y;
-	}
 }
 
 NodePtr successor(BSTPtr bst, NodePtr n) {
-	if (n == bst->nil) {
-		if (n == n->parent->left)
-			return n->parent;
-		else
-			return successor(bst, n->parent);
-	}
-	else {
+
 		if (n->right != bst->nil)
 			return tree_minimum(bst, n->right);
 		NodePtr y = n->parent;
@@ -496,5 +453,34 @@ NodePtr successor(BSTPtr bst, NodePtr n) {
 			y = y->parent;
 		}
 		return y;
+}
+
+NodePtr nil_predecessor(BSTPtr bst, NodePtr x, int n) {
+	while (x != bst->nil) {
+		if (n < x->val) {
+			if (x->left == bst->nil)
+				return predecessor(bst, x);
+			x = x->left;
+		}
+		else {
+			if (x->right == bst->nil)
+				return x;
+			x = x->right;
+		}
+	}
+}
+
+NodePtr nil_successor(BSTPtr bst, NodePtr x, int n) {
+	while (x != bst->nil) {
+		if (n < x->val) {
+			if (x->left == bst->nil)
+				return x;
+			x = x->left;
+		}
+		else {
+			if (x->right == bst->nil)
+				return successor(bst, x);
+			x = x->right;
+		}
 	}
 }
